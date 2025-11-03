@@ -32,10 +32,12 @@ export default function Square() {
 
 
 ``` styles.css ```
+
 This file defines the styles for your React app. The first two CSS selectors (* and body) define the style of large parts of your app while the .square selector defines the style of any component where the className property is set to square. In your code, that would match the button from your Square component in the App.js file.
 
 
 ``` index.js ```
+
 We won’t be editing this file during the tutorial but it is the bridge between the component you created in the App.js file and the web browser.
 
 ## Lets build a board 
