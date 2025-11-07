@@ -336,7 +336,7 @@ export default function Board() {
 
 ## React Developer tools
 
-React DevTools let us check the props and the state of the React components. Right click and choose inspect. 
+React DevTools let us check the props and the state of the React components. Right click and choose inspect. Then select components from the tabs. 
 
 ## Finish the game
 
