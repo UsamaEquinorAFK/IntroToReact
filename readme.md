@@ -336,10 +336,123 @@ export default function Board() {
 
 ## React Developer tools
 
-
+React DevTools let us check the props and the state of the React components. Right click and choose inspect. 
 
 ## Finish the game
 
+Lets start by lifting up the state to the main component, as of now every square (9 in total) maintains a part of the game’s state. To have control over the game we need to know the states o all 9 squares.
 
+One could argue that the main or parent component called Board can ask for the state from all the squares one by one but that could get cumbersome and lifting up the state to parent component is a normal refactoring practice in react. 
 
+#### Rule of thumb: 
 
+To collect data from multiple children, or to have two child components communicate with each other, declare the shared state in their parent component instead. The parent component can pass that state back down to the children via props. This keeps the child components in sync with each other and with their parent.
+
+Edit the Board component so that it declares a state variable named squares that defaults to an array of 9 nulls corresponding to the 9 squares:
+
+``` java
+
+// ...
+export default function Board() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  return (
+    // ...
+  );
+}
+
+``` 
+
+Array(9).fill(null) creates an array with nine elements and sets each of them to null. The useState() call around it declares a squares state variable that’s initially set to that array. Each entry in the array corresponds to the value of a square. While playing the game it could end up looking like this:
+
+``` java
+
+['O', null, 'X', 'X', 'X', 'O', 'O', null, null]
+
+```
+
+Next we can pass the value prop down to each square component and remove handle click logic from square function for now. 
+
+``` java
+
+import { useState } from 'react';
+
+function Square({ value }) {
+  return <button className="square">{value}</button>;
+}
+
+export default function Board() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  return (
+    <>
+      <div className="board-row">
+        <Square value={squares[0]} />
+        <Square value={squares[1]} />
+        <Square value={squares[2]} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[3]} />
+        <Square value={squares[4]} />
+        <Square value={squares[5]} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[6]} />
+        <Square value={squares[7]} />
+        <Square value={squares[8]} />
+      </div>
+    </>
+  );
+}
+
+```
+
+Now we should just have a blank 3x3 grid printed out or 9 squares. Lets add the clickable square logic back into the code now. 
+
+Square component should take in a new prop now. 
+
+``` java
+
+function Square({ value, onSquareClick }) {
+  return (
+    <button className="square" onClick={onSquareClick}>
+      {value}
+    </button>
+  );
+}
+
+```
+
+The Board component should look like this 
+
+``` java
+
+export default function Board() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  
+  function handleClick() {
+    const nextSquares = squares.slice();
+    nextSquares[0] = "X";
+    setSquares(nextSquares);
+  }
+  
+  return (
+    <>
+      <div className="board-row">
+        <Square value={squares[0]} onSquareClick={handleClick} />
+        <Square value={squares[1]} onSquareClick={handleClick} />
+        <Square value={squares[2]} onSquareClick={handleClick} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[3]} onSquareClick={handleClick} />
+        <Square value={squares[4]} onSquareClick={handleClick} />
+        <Square value={squares[5]} onSquareClick={handleClick} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[6]} onSquareClick={handleClick} />
+        <Square value={squares[7]} onSquareClick={handleClick} />
+        <Square value={squares[8]} onSquareClick={handleClick} />
+      </div>
+    </>
+  );
+}
+
+```
