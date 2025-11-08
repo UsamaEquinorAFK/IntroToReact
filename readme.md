@@ -407,7 +407,7 @@ export default function Board() {
 
 Now we should just have a blank 3x3 grid printed out or 9 squares. Lets add the clickable square logic back into the code now. 
 
-Square component should take in a new prop now. 
+Square component should take in a new prop now called onSquareClick.
 
 ``` java
 
@@ -421,7 +421,12 @@ function Square({ value, onSquareClick }) {
 
 ```
 
-The Board component should look like this 
+The Board component should also pass this prop in and should have a new function called handleClick(). 
+
+The handleClick function creates a copy of the squares array (nextSquares) with the JavaScript slice() Array method. Then, handleClick updates the nextSquares array to add X to the first ([0] index) square.
+
+Calling the setSquares function lets React know the state of the component has changed. This will trigger a re-render of the components that use the squares state (Board) as well as its child components (the Square components that make up the board).
+
 
 ``` java
 
@@ -456,3 +461,284 @@ export default function Board() {
 }
 
 ```
+
+Now where ever you click on the board it will put a "X" in the first square. Lets update handleclick to be able to click and select all the squares 
+
+``` java
+function handleClick(i) {
+    const nextSquares = squares.slice();
+    nextSquares[i] = "X";
+    setSquares(nextSquares);
+  }
+
+```
+
+Now naturally we want to pass i into the jsx part like this: 
+
+``` java
+
+<Square value={squares[0]} onSquareClick={handleClick(0)} />
+
+```
+
+Well ! This doesnt works does it ? 
+
+The handleClick(0) call will be a part of rendering the board component. Because handleClick(0) alters the state of the board component by calling setSquares, your entire board component will be re-rendered again. But this runs handleClick(0) again, leading to an infinite loop.
+
+
+When we were passing onSquareClick={handleClick}, we were passing the handleClick function down as a prop. We were not calling it! But now you are calling that function right away—notice the parentheses in handleClick(0)—and that’s why it runs too early. You don’t want to call handleClick until the user clicks!
+
+But we can fix it by doing something like this, 
+
+``` java
+
+<Square value={squares[0]} onSquareClick={() => handleClick(0)} />
+
+
+```
+
+Notice the new fancy syntax change. This is called an arrow function, so instead of calling handleClick(0) everytime we want to render something we pass this as a prop. This could have been done by making 9 seperate functions and then passing them as well. 
+
+
+Cool ! All squares can be selected individually now. Code should look something like this. 
+
+``` java
+
+import { useState } from 'react';
+
+function Square({ value, onSquareClick }) {
+  return (
+    <button className="square" onClick={onSquareClick}>
+      {value}
+    </button>
+  );
+}
+
+export default function Board() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  function handleClick(i) {
+    const nextSquares = squares.slice();
+    nextSquares[i] = 'X';
+    setSquares(nextSquares);
+  }
+
+  return (
+    <>
+      <div className="board-row">
+        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
+        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
+        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
+        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
+        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
+        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
+        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+      </div>
+    </>
+  );
+}
+
+```
+
+Now that your state handling is in the Board component, the parent Board component passes props to the child Square components so that they can be displayed correctly. When clicking on a Square, the child Square component now asks the parent Board component to update the state of the board. When the Board’s state changes, both the Board component and every child Square re-renders automatically. Keeping the state of all squares in the Board component will allow it to determine the winner in the future.
+
+#### Recap 
+
+Let’s recap what happens when a user clicks the top left square on your board to add an X to it:
+
+
+Clicking on the upper left square runs the function that the button received as its onClick prop from the Square. 
+
+
+The Square component received that function as its onSquareClick prop from the Board. The Board component defined that function directly in the JSX. It calls handleClick with an argument of 0.
+handleClick uses the argument (0) to update the first element of the squares array from null to X.
+
+
+The squares state of the Board component was updated, so the Board and all of its children re-render. This causes the value prop of the Square component with index 0 to change from null to X.
+
+
+In the end the user sees that the upper left square has changed from empty to having an X after clicking it.
+
+#### Note on immutability
+
+Note how in handleClick, you call .slice() to create a copy of the squares array instead of modifying the existing array. To explain why, we need to discuss immutability and why immutability is important to learn.
+
+There are generally two approaches to changing data. The first approach is to mutate the data by directly changing the data’s values. The second approach is to replace the data with a new copy which has the desired changes.
+
+Immutability makes complex features much easier to implement.
+
+#### Taking turns 
+
+Lets keep a track of when X should be next and when should it be an O. We can set X to be the first one always
+
+``` java
+
+function Board() {
+  const [xIsNext, setXIsNext] = useState(true);
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  // ...
+}
+
+```
+
+Each time a player moves, xIsNext (a boolean) will be flipped to determine which player goes next and the game’s state will be saved.
+
+``` java
+export default function Board() {
+  const [xIsNext, setXIsNext] = useState(true);
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  function handleClick(i) {
+    const nextSquares = squares.slice();
+    if (xIsNext) {
+      nextSquares[i] = "X";
+    } else {
+      nextSquares[i] = "O";
+    }
+    setSquares(nextSquares);
+    setXIsNext(!xIsNext);
+  }
+
+  return (
+    //...
+  );
+}
+```
+
+#### How would you fix over writing ? 
+
+``` java
+
+if (squares[i]) {
+    return;
+  }
+
+```
+
+
+The code should looks something like this now
+
+``` java
+
+import { useState } from 'react';
+
+function Square({value, onSquareClick}) {
+  return (
+    <button className="square" onClick={onSquareClick}>
+      {value}
+    </button>
+  );
+}
+
+export default function Board() {
+  const [xIsNext, setXIsNext] = useState(true);
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  function handleClick(i) {
+    if (squares[i]) {
+      return;
+    }
+    const nextSquares = squares.slice();
+    if (xIsNext) {
+      nextSquares[i] = 'X';
+    } else {
+      nextSquares[i] = 'O';
+    }
+    setSquares(nextSquares);
+    setXIsNext(!xIsNext);
+  }
+
+  return (
+    <>
+      <div className="board-row">
+        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
+        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
+        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
+        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
+        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
+      </div>
+      <div className="board-row">
+        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
+        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
+        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+      </div>
+    </>
+  );
+}
+
+```
+
+
+#### Adding function to calculate the winner
+
+``` java
+
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
+
+```
+
+Next we can call thing function in the board component
+
+``` java
+
+function handleClick(i) {
+  if (squares[i] || calculateWinner(squares)) {
+    return;
+  }
+
+```
+
+And furthermore, 
+
+``` java
+
+export default function Board() {
+  // ...
+  const winner = calculateWinner(squares);
+  let status;
+  if (winner) {
+    status = "Winner: " + winner;
+  } else {
+    status = "Next player: " + (xIsNext ? "X" : "O");
+  }
+
+  return (
+    <>
+      <div className="status">{status}</div>
+      <div className="board-row">
+        // ...
+  )
+}
+
+```
+
+
+Congratulations ! We have completed a whole tic tac toe game :)) 
