@@ -7,9 +7,13 @@
 We will go through some concepts like,
 
 1 - Components
+
 2 - Parent and children components
-3 - State
+
+3 - What is a State and why we need it ?
+
 4 - Lifting state up (Refactoring)
+
 5 - Immutability
 
 
