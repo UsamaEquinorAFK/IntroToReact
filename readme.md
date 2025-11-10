@@ -4,6 +4,15 @@
 ### How ? : We build a game
 ### Why ? : Well because its fun
 
+We will go through some concepts like,
+
+1 - Components
+2 - Parent and children components
+3 - State
+4 - Lifting state up (Refactoring)
+5 - Immutability
+
+
 A super similar tutorial can be followed [here](https://react.dev/learn/tutorial-tic-tac-toe) but we want to develop locally so we will just clone this repo. The link is also very helpful so I recommend you give it a read. 
 
 ## Setup for tutorial
@@ -742,3 +751,11 @@ export default function Board() {
 
 
 Congratulations ! We have completed a whole tic tac toe game :)) 
+
+
+
+Bonus Task or if you find the tutorial too simple ? : 
+
+1 - Write a test ? 
+2 - Re-write this into sudoku.
+3 - Add history for the moves made. 
