@@ -761,5 +761,7 @@ Congratulations ! We have completed a whole tic tac toe game :))
 Bonus Task or if you find the tutorial too simple ? : 
 
 1 - Write a test ? 
+
 2 - Re-write this into sudoku.
+
 3 - Add history for the moves made. 
